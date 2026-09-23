@@ -14,6 +14,11 @@ evidence_dir=${R2MD_EVIDENCE_DIR:-"$HOME"}
 mkdir -p "$evidence_dir"
 log_file="$run_dir/full_skill_test.log"
 
+# sha256sum on Linux; shasum ships with macOS instead.
+sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum "$@"; else shasum -a 256 "$@"; fi
+}
+
 cat > "$run_dir/prompt.txt" <<'PROMPT'
 Use $research-to-markdown, installed at .agents/skills/research-to-markdown/SKILL.md, to analyze inputs/git_slides.pptx.
 
@@ -30,7 +35,7 @@ printf '\nWrite the Markdown copy at this exact new path: %s\n' "$run_dir/conver
   cat "$run_dir/prompt.txt"
   printf '\nCommand: codex exec --json --sandbox workspace-write --skip-git-repo-check -o %q -\n' "$run_dir/answer.md"
 } > "$log_file" 2>&1
-sha256sum "$project_dir"/inputs/* "$project_dir/pixi.lock" "$project_dir/bin/r2md" "$skill" > "$run_dir/hashes_before.txt"
+sha256 "$project_dir"/inputs/* "$project_dir/pixi.lock" "$project_dir/bin/r2md" "$skill" > "$run_dir/hashes_before.txt"
 
 printf 'Running one Codex skill test; results will be saved to %s\n' "$log_file"
 if codex exec --json --sandbox workspace-write --skip-git-repo-check \
@@ -47,7 +52,7 @@ overall_status=$session_status
   printf '\nDiagnostics:\n'
   cat "$run_dir/diagnostics.log"
   printf '\nSource and configuration preservation:\n'
-  if sha256sum -c "$run_dir/hashes_before.txt"; then
+  if sha256 -c "$run_dir/hashes_before.txt"; then
     printf 'All recorded input/configuration hashes are unchanged.\n'
   else
     overall_status=1
@@ -55,7 +60,7 @@ overall_status=$session_status
   if [[ -s "$run_dir/converted.md" ]]; then
     printf '\nGenerated Markdown lines/bytes: '
     wc -lc < "$run_dir/converted.md"
-    sha256sum "$run_dir/converted.md"
+    sha256 "$run_dir/converted.md"
   else
     printf '\nNo nonempty converted Markdown file was produced.\n'
     overall_status=1

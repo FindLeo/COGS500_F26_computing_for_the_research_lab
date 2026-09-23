@@ -9,7 +9,7 @@ platforms = ["osx-arm64", "linux-64"]
 python = "3.12.*"
 
 [pypi-dependencies]
-markitdown = { version = "*", extras = ["pdf", "docx", "pptx"] }
+markitdown = { version = ">=0.1.8,<0.2", extras = ["pdf", "docx", "pptx"] }
 
 [tasks]
 r2md = "markitdown"

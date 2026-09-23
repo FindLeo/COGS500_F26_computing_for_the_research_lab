@@ -15,6 +15,13 @@ if ! mkdir -p "$run_dir/outputs"; then
   exit 1
 fi
 log_file="$run_dir/full_conversion.log"
+# Exit statuses 0-6 count failed files; setup errors use values above that range.
+setup_error=100
+
+# sha256sum on Linux; shasum ships with macOS instead.
+sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum "$@"; else shasum -a 256 "$@"; fi
+}
 
 image_audit() {
   python3 - "$1" <<'PY'
@@ -43,15 +50,15 @@ main() {
   printf 'System: '; uname -srm
   if ! command -v pixi; then
     printf 'ERROR: pixi is not on PATH.\n'
-    return 127
+    return "$setup_error"
   fi
   pixi --version
   if [[ ! -f pixi.lock ]]; then
     printf 'ERROR: pixi.lock is missing; a locked run cannot proceed.\n'
-    return 1
+    return "$setup_error"
   fi
   printf 'Manifest and lockfile SHA-256:\n'
-  sha256sum pixi.toml pixi.lock
+  sha256 pixi.toml pixi.lock
   printf 'Installed MarkItDown version: '
   pixi run --locked --manifest-path "$project_dir/pixi.toml" python -c 'from importlib.metadata import version; print(version("markitdown"))'
 
@@ -77,7 +84,7 @@ main() {
       ((failures += 1))
       continue
     fi
-    printf 'Input SHA-256: '; sha256sum "$input"
+    printf 'Input SHA-256: '; sha256 "$input"
     printf 'Command: pixi run --locked --manifest-path %q markitdown %q -o %q\n' "$project_dir/pixi.toml" "$input" "$output"
     if pixi run --locked --manifest-path "$project_dir/pixi.toml" markitdown "$input" -o "$output"; then
       result=0
@@ -88,7 +95,7 @@ main() {
     printf 'Exit status: %s\n' "$result"
     if [[ -f "$output" ]]; then
       printf 'Output lines/bytes: '; wc -lc < "$output"
-      printf 'Output SHA-256: '; sha256sum "$output"
+      printf 'Output SHA-256: '; sha256 "$output"
       image_audit "$output"
       printf '%s\n' '----- BEGIN COMPLETE MARKDOWN -----'
       cat "$output"
@@ -111,9 +118,9 @@ if cp "$log_file" "$download_copy"; then
 else
   printf 'Could not copy the log to the home directory; use the original log path above.\n' >&2
 fi
-if ((status <= 6)); then
-  printf 'Successful files: %s/6\n' "$((6 - status))"
-else
+if ((status == setup_error)); then
   printf 'The run could not start; see the log for the error.\n'
+else
+  printf 'Successful files: %s/6\n' "$((6 - status))"
 fi
 exit "$status"

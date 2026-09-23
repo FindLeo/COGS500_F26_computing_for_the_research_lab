@@ -8,6 +8,11 @@ run_dir="$project_dir/runs/cli_$run_id"
 mkdir -p "$run_dir"
 log_file="$run_dir/cli_tests.log"
 
+# sha256sum on Linux; shasum ships with macOS instead.
+sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum "$@"; else shasum -a 256 "$@"; fi
+}
+
 finish() {
   status=$?
   trap - EXIT
@@ -45,9 +50,9 @@ main() {
   [[ -f "$project_dir/pixi.lock" ]] || { printf 'Missing pixi.lock\n'; return 1; }
   command -v pixi
   pixi --version
-  sha256sum "$project_dir/pixi.toml" "$project_dir/pixi.lock" "$project_dir/bin/r2md"
+  sha256 "$project_dir/pixi.toml" "$project_dir/pixi.lock" "$project_dir/bin/r2md"
   cp "$project_dir/pixi.lock" "$run_dir/lock_before"
-  sha256sum "$project_dir"/inputs/* > "$run_dir/input_hashes_before.txt"
+  sha256 "$project_dir"/inputs/* > "$run_dir/input_hashes_before.txt"
 
   printf '\nInstall command and skill\n'
   mkdir -p "$HOME/.local/bin"
@@ -101,7 +106,7 @@ main() {
   expect_rejection "$target" "$run_dir/missing.pdf" -o "$run_dir/missing.md"
   [[ ! -e "$run_dir/missing.md" ]]
 
-  printf '\n6. Source path cannot be used as output\n'
+  printf '\n6. Source path is rejected as output (it fails the .md output check)\n'
   expect_rejection "$target" "$sample" -o "$sample"
   cmp "$sample" "$project_dir/inputs/project_proposal.docx"
 
@@ -110,7 +115,7 @@ main() {
   wc -lc "$run_dir/git_slides.md"
 
   printf '\n8. Original sources and lockfile remain unchanged\n'
-  sha256sum -c "$run_dir/input_hashes_before.txt"
+  sha256 -c "$run_dir/input_hashes_before.txt"
   cmp "$run_dir/lock_before" "$project_dir/pixi.lock"
   printf 'PASS: original sources and lockfile unchanged.\n'
 
