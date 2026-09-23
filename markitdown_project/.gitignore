@@ -1,0 +1,11 @@
+.pixi/
+__pycache__/
+.DS_Store
+# Keep public source downloads and generated conversions local.
+inputs/
+outputs/
+runs/
+logs/
+report/
+notebook_materials/
+*.zip

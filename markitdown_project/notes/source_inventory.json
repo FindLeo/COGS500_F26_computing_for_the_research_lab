@@ -1,0 +1,62 @@
+[
+  {
+    "filename": "git_cheatsheet.pdf",
+    "format": "pdf",
+    "size_bytes": 100194,
+    "sha256": "469157b16528a7282a0bd38e039b71b8c9696d46740d9c0165aa50706fbc460a",
+    "recorded_at": "2026-09-22T19:13:55.259571+00:00",
+    "source": "../git-cheatsheet.pdf",
+    "source_page": null,
+    "reason": "Course Git reference; inspect compact command text and reading order."
+  },
+  {
+    "filename": "datalad_cheatsheet.pdf",
+    "format": "pdf",
+    "size_bytes": 166927,
+    "sha256": "0c3af1ea4cb5b3f5d72a56a02fda0c861488fa473de1eb609d6ee8348c805d4f",
+    "recorded_at": "2026-09-22T19:13:55.259970+00:00",
+    "source": "../M7_datalad-cheatsheet.pdf",
+    "source_page": null,
+    "reason": "Course DataLad reference; inspect commands and compact layout."
+  },
+  {
+    "filename": "project_proposal.docx",
+    "format": "docx",
+    "size_bytes": 39804,
+    "sha256": "5c618ac523faa802fc22d3fec18e41c99deef109a321fd2edfc7a7fdf773d15a",
+    "recorded_at": "2026-09-22T19:13:55.260238+00:00",
+    "source": "../MarkItDown_Project_Proposal_Si-Yang_Liu.docx",
+    "source_page": null,
+    "reason": "User proposal prepared with AI assistance; known facts, headings, and resource links."
+  },
+  {
+    "filename": "git_slides.pptx",
+    "format": "pptx",
+    "size_bytes": 17824389,
+    "sha256": "af5add00d0b6ed0ef65e9a07672dfedbf3d925826abf4094dbd44f7818e99130",
+    "recorded_at": "2026-09-22T19:13:55.272676+00:00",
+    "source": "https://www.chpc.utah.edu/presentations/git.pptx",
+    "source_page": "https://www.chpc.utah.edu/presentations/IntroGit.php",
+    "reason": "University of Utah CHPC Git training; course-related command text and slide organization."
+  },
+  {
+    "filename": "unix_slides.pptx",
+    "format": "pptx",
+    "size_bytes": 4640397,
+    "sha256": "daac6ffb04ad6590af8aae8cc7652903a27b756d21a0076b92dce650441927da",
+    "recorded_at": "2026-09-22T19:13:55.276447+00:00",
+    "source": "https://mbite.mdhs.unimelb.edu.au/tutorials/unix/media/unix_intro_slides.pptx",
+    "source_page": "https://mbite.mdhs.unimelb.edu.au/tutorials/unix/unix/",
+    "reason": "Archived University of Melbourne Unix training; course-related technical text and slide organization."
+  },
+  {
+    "filename": "rdm_quiz.docx",
+    "format": "docx",
+    "size_bytes": 22298,
+    "sha256": "f598c9a4fd21c74207a9d4e25ae69c03c683224555f8a32f70faa6077d7f7a6f",
+    "recorded_at": "2026-09-22T19:13:55.276703+00:00",
+    "source": "https://www.dcc.ac.uk/sites/default/files/documents/events/workshops/Cardiff-Met/Funder%20requirements%20quiz.docx",
+    "source_page": "https://www.dcc.ac.uk/events/workshops/introduction-research-data-management-and-data-management-plans",
+    "reason": "DCC 2014 research data management quiz; historical conversion sample, not current funder policy guidance."
+  }
+]

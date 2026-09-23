@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Research to Markdown: the project's small, file-preserving CLI.
+set -euo pipefail
+
+usage() {
+  printf 'Usage: r2md INPUT.{pdf,docx,pptx} -o NEW_OUTPUT.md [--keep-data-uris]\n'
+  printf 'Set R2MD_PROJECT_DIR if the Pixi project is not ~/markitdown_project.\n'
+}
+if [[ $# == 0 || ${1:-} == --help || ${1:-} == -h ]]; then
+  usage
+  exit 0
+fi
+input=$1
+shift
+output=''
+keep_images=false
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -o|--output)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      output=$2
+      shift 2
+      ;;
+    --keep-data-uris) keep_images=true; shift ;;
+    *) printf 'Unknown argument: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+  esac
+done
+[[ -f "$input" ]] || { printf 'Input file not found: %s\n' "$input" >&2; exit 2; }
+case "$input" in
+  *.[pP][dD][fF]|*.[dD][oO][cC][xX]|*.[pP][pP][tT][xX]) ;;
+  *) printf 'This project supports PDF, DOCX, and PPTX files.\n' >&2; exit 2 ;;
+esac
+[[ "$output" == *.md ]] || { printf 'Choose an output ending in .md with -o.\n' >&2; exit 2; }
+[[ ! -e "$output" && ! -L "$output" ]] || { printf 'Output already exists; choose a new path: %s\n' "$output" >&2; exit 2; }
+
+project_dir=${R2MD_PROJECT_DIR:-"$HOME/markitdown_project"}
+[[ -f "$project_dir/pixi.lock" ]] || { printf 'Missing lockfile in %s\n' "$project_dir" >&2; exit 2; }
+if command -v pixi >/dev/null 2>&1; then
+  pixi_bin=$(command -v pixi)
+elif [[ -x "$HOME/.pixi/bin/pixi" ]]; then
+  pixi_bin="$HOME/.pixi/bin/pixi"
+else
+  printf 'Pixi is unavailable. Install it in this account first.\n' >&2
+  exit 127
+fi
+
+# Absolute input paths also handle filenames beginning with a hyphen.
+input="$(cd "$(dirname "$input")" && pwd)/$(basename "$input")"
+mkdir -p "$(dirname "$output")"
+convert=("$pixi_bin" run --locked --manifest-path "$project_dir/pixi.toml" markitdown "$input" -o "$output")
+if $keep_images; then convert+=(--keep-data-uris); fi
+"${convert[@]}"
+[[ -s "$output" ]] || { printf 'Conversion created no usable text; inspect the source.\n' >&2; exit 1; }
+printf 'Markdown: %s/%s\n' "$(cd "$(dirname "$output")" && pwd)" "$(basename "$output")"
+case "$input" in
+  *.[pP][dD][fF]) printf 'Review PDF reading order, tables, and visual content against the original.\n' >&2 ;;
+  *.[dD][oO][cC][xX]) printf 'Review list hierarchy, tables, and formatting against the original.\n' >&2 ;;
+  *.[pP][pP][tT][xX]) printf 'Review slide order, diagrams, and image targets. Existing alt text is not image analysis.\n' >&2 ;;
+esac

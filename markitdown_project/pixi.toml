@@ -1,0 +1,15 @@
+[workspace]
+name = "research-to-markdown"
+version = "0.1.0"
+description = "Course project evaluating research document conversion with MarkItDown"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[dependencies]
+python = "3.12.*"
+
+[pypi-dependencies]
+markitdown = { version = "*", extras = ["pdf", "docx", "pptx"] }
+
+[tasks]
+r2md = "markitdown"
